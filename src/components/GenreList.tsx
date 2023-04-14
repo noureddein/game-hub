@@ -10,10 +10,11 @@ import useGenres, { Genre } from "../hooks/useGenres";
 import getCroppedImageUrl from "../services/image-url";
 
 interface Props {
-    onSelectGenre: (genre: Genre | null) => void ;
+    onSelectGenre: (genre: Genre | null) => void;
+    selectedGenre: Genre | null;
 }
 
-const GenreList = ({ onSelectGenre }: Props) => {
+const GenreList = ({ onSelectGenre, selectedGenre }: Props) => {
     const { data: genres, error, isLoading } = useGenres();
 
     if (error) return null;
@@ -26,13 +27,15 @@ const GenreList = ({ onSelectGenre }: Props) => {
                 <Button
                     onClick={() => onSelectGenre(null)}
                     fontSize="lg"
-                    variant="link">
+                    variant="link"
+                    fontWeight={!selectedGenre ? "bolder" : "normal"}
+                    color={!selectedGenre ? "green.400" : ""}>
                     All
                 </Button>
             </ListItem>
             {genres.map((genre) => (
                 <ListItem key={genre.id} paddingY="5px">
-                    <HStack>
+                    <HStack >
                         <Image
                             boxSize="32px"
                             borderRadius={8}
@@ -41,7 +44,17 @@ const GenreList = ({ onSelectGenre }: Props) => {
                         <Button
                             onClick={() => onSelectGenre(genre)}
                             fontSize="lg"
-                            variant="link">
+                            variant="link"
+                            fontWeight={
+                                selectedGenre?.id === genre.id
+                                    ? "bolder"
+                                    : "normal"
+                            }
+                            colorScheme={
+                                selectedGenre?.id === genre.id
+                                    ? "green"
+                                    : ""
+                            }>
                             {genre.name}
                         </Button>
                     </HStack>
