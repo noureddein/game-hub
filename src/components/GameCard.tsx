@@ -1,8 +1,8 @@
 ﻿// ** Chakra components import
 import { Card, CardBody, HStack, Heading, Image, Text } from "@chakra-ui/react";
 
-// ** Hooks import
-import { Game } from "../hooks/useGames";
+// ** Types import
+import { type Game } from "../hooks/useGames";
 
 // ** Components import
 import PlatformIconsList from "./PlatformIconsList";
