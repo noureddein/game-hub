@@ -12,8 +12,7 @@ const CriticScore = ({ score }: Props) => {
             fontSize="14px"
             padding={2}
             borderRadius="4px"
-            fontWeight='medium'
-            >
+            fontWeight="medium">
             {score}
         </Badge>
     );
