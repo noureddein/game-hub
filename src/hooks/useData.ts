@@ -1,35 +1,49 @@
 ﻿import React, { useEffect, useState } from "react";
 import apiClient from "../services/api-client";
-import { CanceledError } from "axios";
+import { AxiosRequestConfig, CanceledError } from "axios";
 
 interface FetchResponse<T> {
     count: number;
     results: T[];
 }
 
-function useData<T>(endpoint: string) {
+function useData<T>(
+    endpoint: string,
+    requestConfig?: AxiosRequestConfig,
+    deps?: any[]
+) {
     const [data, setData] = useState<T[]>([]);
     const [error, setError] = useState("");
     const [isLoading, setLoading] = useState(false);
 
-    useEffect(() => {
-        const controller = new AbortController();
+    useEffect(
+        () => {
+            const controller = new AbortController();
+            setData([])
+            setLoading(true);
+            apiClient
+                .get<FetchResponse<T>>(endpoint, {
+                    signal: controller.signal,
+                    ...requestConfig,
+                })
+                .then((res) => {
+                    setData(res.data.results);
+                    setLoading(false);
+                })
+                .catch((err) => {
+                    if (err instanceof CanceledError) return;
+                    setError(err.message);
+                    setLoading(false);
+                });
 
-        setLoading(true);
-        apiClient
-            .get<FetchResponse<T>>(endpoint, { signal: controller.signal })
-            .then((res) => {
-                setData(res.data.results);
-                setLoading(false);
-            })
-            .catch((err) => {
-                if (err instanceof CanceledError) return;
-                setError(err.message);
-                setLoading(false);
-            });
+            return () => controller.abort();
 
-        return () => controller.abort();
-    }, []);
+            // ** Dependencies error
+            // Type 'any[] | undefined' must have a '[Symbol.iterator]()' method that returns an iterator.
+            // Because we defined deps as optional, it could be undefined, so we cannot spread an undefined object
+        },
+        deps ? [...deps] : []
+    );
 
     return { data, error, isLoading };
 }
