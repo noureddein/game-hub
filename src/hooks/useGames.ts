@@ -18,17 +18,22 @@ export interface Game {
     metacritic: number;
 }
 
-const useGames = (gameQuery: GameQuery) =>
-    useData<Game>(
-        "/games",
-        {
-            params: {
-                genres: gameQuery.genre?.id,
-                platforms: gameQuery.platform?.id,
-                ordering: gameQuery.sortOrder
-            },
+const useGames = (gameQuery: GameQuery) => {
+    const params = {
+        params: {
+            genres: gameQuery.genre?.id,
+            platforms: gameQuery.platform?.id,
+            ordering: gameQuery.sortOrder,
         },
-        [gameQuery.genre?.id, gameQuery.platform?.id, gameQuery.sortOrder]
-    );
+    };
+
+    const deps = [
+        gameQuery.genre?.id,
+        gameQuery.platform?.id,
+        gameQuery.sortOrder,
+    ];
+
+    return useData<Game>("/games", params, [...deps]);
+};
 
 export default useGames;

@@ -1,6 +1,7 @@
-﻿// https://media.rawg.io/media/games/d58/d588947d4286e7b5e0e12e1bea7d9844.jpg
+﻿import noImage from '../assets/no-image.webp';
+
 const getCroppedImageUrl = (url: string) => {
-    if(!url) return url
+    if(!url) return noImage
 
     const TARGET = "media/";
 

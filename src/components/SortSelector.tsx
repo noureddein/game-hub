@@ -31,9 +31,7 @@ const menuItems: MenuItem[] = [
 ];
 
 const SortSelector = ({ onSelectSortOrder, sortOrder }: Props) => {
-    const currentSortOrder = menuItems.find(
-        (e) => sortOrder === e.value
-    );
+    const currentSortOrder = menuItems.find((e) => sortOrder === e.value);
 
     return (
         <Box>
