@@ -49,7 +49,7 @@ function App() {
             }}
             templateColumns={{
                 base: "1fr",
-                lg: "1fr 6fr",
+                lg: "200px 1fr",
             }}>
             <GridItem area="nav">
                 <Navbar onSearch={onSearch} />
