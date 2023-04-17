@@ -18,7 +18,7 @@ const truncateHeading = (title: string) => {
     const titleLength = title.length;
 
     if (titleLength <= defaultLength) return title;
-    return `${title.substring(0, defaultLength)}...`
+    return `${title.substring(0, defaultLength)}...`;
 };
 
 const GameCard = ({ game }: Props) => {
@@ -26,8 +26,7 @@ const GameCard = ({ game }: Props) => {
         <Card>
             <Image src={getCroppedImageUrl(game.background_image)} />
             <CardBody>
-                <Heading fontSize="2xl" title={game.name}>{truncateHeading(game.name)}</Heading>
-                <HStack justifyContent="space-between">
+                <HStack justifyContent="space-between" marginBottom={3}>
                     <PlatformIconsList
                         platforms={game.parent_platforms.map(
                             (p) => p?.platform
@@ -35,6 +34,9 @@ const GameCard = ({ game }: Props) => {
                     />
                     <CriticScore score={game.metacritic} />
                 </HStack>
+                <Heading fontSize="2xl" title={game.name}>
+                    {truncateHeading(game.name)}
+                </Heading>
             </CardBody>
         </Card>
     );
