@@ -12,7 +12,6 @@ import GenreList from "./components/GenreList";
 // ** Types imports
 import { type Genre } from "./hooks/useGenres";
 import { type Platform } from "./hooks/usePlatforms";
-import { type MenuItem } from "./components/SortSelector";
 
 // ** Hooks imports
 import PlatformSelector from "./components/PlatformSelector";
@@ -62,7 +61,7 @@ function App() {
                     />
                 </GridItem>
             </Show>
-            <GridItem area="main" >
+            <GridItem area="main">
                 <Box padding="10px">
                     <GameHeading gameQuery={gameQuery} />
                     <HStack marginBottom={5} spacing={5}>
