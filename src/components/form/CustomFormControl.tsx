@@ -6,30 +6,34 @@
 } from "@chakra-ui/react";
 
 interface FormControlTypes {
-    isInvalid: boolean
+    isInvalid: boolean;
     register: object;
     type?: string | "text";
-    errMsg?: string
+    errMsg?: string;
     id?: string;
     placeholder?: string;
-    label?: string 
-    isRequired?: boolean | false
+    label?: string;
+    isRequired?: boolean | false;
 }
 
-const CustomFormControl = ({
-    id,
-    register,
-    placeholder,
-    type,
-    isInvalid,
-    errMsg,
-    label,
-    isRequired
-}: FormControlTypes) => {
-    console.log(register)
+const CustomFormControl = (props: FormControlTypes) => {
+    const {
+        id,
+        register,
+        placeholder,
+        type,
+        isInvalid,
+        errMsg,
+        label,
+        isRequired,
+    } = props;
+    
     return (
         <>
-            <FormControl isInvalid={isInvalid} marginBottom={2} isRequired={isRequired}>
+            <FormControl
+                isInvalid={isInvalid}
+                marginBottom={2}
+                isRequired={isRequired}>
                 <FormLabel htmlFor={id}>{label}</FormLabel>
                 <Input
                     {...register}

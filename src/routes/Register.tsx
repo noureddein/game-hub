@@ -1,25 +1,15 @@
-﻿import {
-    Grid,
-    GridItem,
-    Text,
-    FormControl,
-    FormLabel,
-    FormErrorMessage,
-    FormHelperText,
-    Input,
-    Box,
-    Flex,
-    VStack,
-} from "@chakra-ui/react";
+﻿import { Grid, GridItem, Text, Box, Flex, VStack } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import CustomFormControl from "../components/form/CustomFormControl";
+import backendClient from "../services/backend-client";
 
 type FieldData = z.infer<typeof schema>;
 
 const schema = z
     .object({
+        username: z.string().min(4, "Username must be at least 4 characters."),
         firstName: z
             .string()
             .min(4, "First name must be at least 4 characters."),
@@ -38,120 +28,21 @@ const schema = z
         message: "Passwords don't match",
         path: ["confirmPassword"],
     });
-// const Register = () => {
-//     return (
-//         <Grid
-//             templateColumns={{
-//                 base: "repeat(6, 1fr)",
-//                 md: "repeat(6, 1fr)",
-//             }}
-//             gap={0}
-//             border="1px"
-//             borderColor="gray.200"
-//             marginTop={7}>
-//             <GridItem
-//                 colStart={{
-//                     base: 2,
-//                     xl: 3,
-//                 }}
-//                 colEnd={{
-//                     base: 6,
-//                     xl: 5,
-//                 }}
-//                 // bg="gray.600"
-//                 borderTopRadius={7}>
 
-//                 <Text paddingY="2rem" color="blackAlpha.900" textAlign="center">
-//                     Register
-//                 </Text>
-//             </GridItem>
-
-//             <GridItem
-//                 padding={4}
-//                 // bg="blue.200"
-//                 colStart={{
-//                     base: 2,
-//                     xl: 3,
-//                 }}
-//                 colEnd={{
-//                     base: 6,
-//                     xl: 5,
-//                 }}
-//                 borderBottomRadius={7}>
-//                 <form>
-//                     <FormControl>
-//                         <FormLabel htmlFor="first-name">First name</FormLabel>
-//                         <Input
-//                             id="first-name"
-//                             type="text"
-//                             placeholder="Enter your first name"
-//                             variant="outline"
-//                             bgColor=""
-//                         />
-//                     </FormControl>
-//                     <FormControl>
-//                         <FormLabel htmlFor="last-name">Last name</FormLabel>
-//                         <Input
-//                             id="last-name"
-//                             type="text"
-//                             placeholder="Enter your last name"
-//                         />
-//                     </FormControl>
-//                     <FormControl>
-//                         <FormLabel htmlFor="email">Email</FormLabel>
-//                         <Input
-//                             id="email"
-//                             type="email"
-//                             placeholder="Enter your email"
-//                         />
-//                     </FormControl>
-//                     <FormControl>
-//                         <FormLabel htmlFor="password">Password</FormLabel>
-//                         <Input
-//                             id="password"
-//                             type="password"
-//                             placeholder="Enter your password"
-//                         />
-//                     </FormControl>
-//                     <FormControl>
-//                         <FormLabel htmlFor="confirm-password">
-//                             Confirm password
-//                         </FormLabel>
-//                         <Input
-//                             id="confirm-password"
-//                             type="password"
-//                             placeholder="Enter your confirm password"
-//                         />
-//                     </FormControl>
-//                     <Flex justifyContent="center">
-//                         <Box
-//                             as="button"
-//                             borderRadius="md"
-//                             bg="tomato"
-//                             color="white"
-//                             px={8}
-//                             h={12}
-//                             w="auto"
-//                             marginRight={0}>
-//                             Submit
-//                         </Box>
-//                     </Flex>
-//                 </form>
-//             </GridItem>
-//         </Grid>
-//     );
-// };
 const Register = () => {
     const {
         register,
         handleSubmit,
-        formState,
-        watch,
         formState: { errors, isValid },
     } = useForm<FieldData>({ resolver: zodResolver(schema) });
 
-    const onSubmit = (data: FieldData) => console.log(data);
-    console.log(errors);
+    const onSubmit = (data: FieldData) => {
+        console.log(data)
+        backendClient
+            .post("/v1/user/create", { ...data })
+            .then((data) => console.log(data))
+            .catch((err) => console.log(err));
+    };
     return (
         <Grid
             templateColumns={{
@@ -183,6 +74,17 @@ const Register = () => {
                     <Box w="100%" margin="0px" padding={7}>
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <CustomFormControl
+                                errMsg={errors.username?.message}
+                                register={{
+                                    ...register("username", {
+                                        required: true,
+                                    }),
+                                }}
+                                isInvalid={!!errors.username}
+                                label="Username"
+                                placeholder="Enter your username.."
+                            />
+                            <CustomFormControl
                                 errMsg={errors.firstName?.message}
                                 register={{
                                     ...register("firstName", {
@@ -193,6 +95,7 @@ const Register = () => {
                                 label="First name"
                                 placeholder="Enter your first name.."
                             />
+
                             <CustomFormControl
                                 errMsg={errors.lastName?.message}
                                 register={{
