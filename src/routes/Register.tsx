@@ -3,9 +3,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import CustomFormControl from "../components/form/CustomFormControl";
-import backendClient from "../services/backend-client";
+import useRegister from "../hooks/useRegister";
+import { useEffect } from "react";
 
-type FieldData = z.infer<typeof schema>;
+export type FieldData = z.infer<typeof schema>;
 
 const schema = z
     .object({
@@ -25,7 +26,7 @@ const schema = z
         confirmPassword: z.string().nonempty("Confirm password is required."),
     })
     .refine((data) => data.password === data.confirmPassword, {
-        message: "Passwords don't match",
+        message: "Passwords don't match.",
         path: ["confirmPassword"],
     });
 
@@ -33,17 +34,32 @@ const Register = () => {
     const {
         register,
         handleSubmit,
-        formState: { errors, isValid },
+        formState: { errors },
+        setError,
     } = useForm<FieldData>({ resolver: zodResolver(schema) });
+    const { onSubmitForm, errors: resErrors, status } = useRegister();
 
-    const onSubmit = (data: FieldData) => {
-        console.log(data)
-        backendClient
-            .post("/v1/user/create", { ...data })
-            .then((res) => console.log({res}))
-            .catch((err) => {
-                console.log({err})
+    useEffect(() => {
+        if (status === 409) {
+            const key = Object.keys(resErrors?.fields)[0];
+            setError(key, {
+                type: "server",
+                message: resErrors.message,
             });
+        }
+        if (status === 422) {
+            resErrors.errors.forEach((obj: { [key: string]: string[] }) => {
+                const key = Object.keys(obj)[0];
+                setError(key, {
+                    type: "server",
+                    message: obj[key],
+                });
+            });
+        }
+    }, [resErrors]);
+
+    const onSubmit = async (data: FieldData) => {
+        await onSubmitForm(data);
     };
     return (
         <Grid
@@ -52,7 +68,8 @@ const Register = () => {
                 md: "repeat(6, 1fr)",
             }}
             gap={0}
-            marginTop={7}>
+            marginTop={7}
+        >
             <GridItem
                 colStart={{
                     base: 2,
@@ -61,14 +78,16 @@ const Register = () => {
                 colEnd={{
                     base: 6,
                     xl: 5,
-                }}>
+                }}
+            >
                 <VStack border="2px" borderColor="gray.400" borderRadius={5}>
                     <Box w="100%">
                         <Text
                             paddingY="2rem"
                             textAlign="center"
                             fontSize="5xl"
-                            fontWeight="bold">
+                            fontWeight="bold"
+                        >
                             Register
                         </Text>
                     </Box>
@@ -158,7 +177,8 @@ const Register = () => {
                                     color="white"
                                     px={8}
                                     h={12}
-                                    w="auto">
+                                    w="auto"
+                                >
                                     Submit
                                 </Box>
                             </Flex>

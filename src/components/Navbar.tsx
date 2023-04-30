@@ -1,5 +1,5 @@
 ﻿// ** Chakra imports
-import { HStack, Image, Link  } from "@chakra-ui/react";
+import { HStack, Image, Link } from "@chakra-ui/react";
 import { Link as ReachLink } from "react-router-dom";
 
 // ** Components imports
@@ -17,17 +17,24 @@ interface Props {
 const Navbar = ({ onSearch }: Props) => {
     return (
         <HStack padding="10px">
-            <Image src={logo} alt="logo" boxSize="60px" />
+            <Link as={ReachLink} to="/">
+                <Image src={logo} alt="logo" boxSize="60px" />
+            </Link>
             <SearchInput onSearch={onSearch} />
             <div>
                 <Link
                     as={ReachLink}
                     to="/login"
                     style={{ margin: ".25rem" }}
-                    isExternal={false}>
+                    isExternal={false}
+                >
                     Login
                 </Link>
-                <Link as={ReachLink} to="/register" style={{ margin: ".25rem" }}>
+                <Link
+                    as={ReachLink}
+                    to="/register"
+                    style={{ margin: ".25rem" }}
+                >
                     Register
                 </Link>
             </div>
