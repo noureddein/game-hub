@@ -8,19 +8,19 @@ interface SubmitResults {
     status: number;
 }
 
-const useRegister = () => {
+const useRegister = (endpoint: string) => {
     const [submitResults, setSubmitResults] = useState<SubmitResults>({
         errors: {},
         success: null,
         status: 0,
     });
 
-    const onSubmitForm = async (formData: FieldData) => {
+    const onSubmitForm = async <T>(formData: T) => {
         try {
-            const res = await backendClient.post("/v1/user/create", {
+            const res = await backendClient.post(endpoint, {
                 ...formData,
             });
-            console.log(res);
+            return res
         } catch (err: any) {
             setSubmitResults({
                 ...submitResults,
@@ -28,7 +28,6 @@ const useRegister = () => {
                 status: err.response.status,
             });
         }
-
     };
 
     return {
