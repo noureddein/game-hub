@@ -1,24 +1,28 @@
-import { Box, Flex } from "@chakra-ui/react";
+import { useEffect } from "react";
 
-import CustomFormControl from "../components/form/CustomFormControl";
+import { Box, Flex } from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/react";
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import Cookies from "js-cookie";
+
+import useRegister from "../hooks/useRegister";
+import useAuth from "../hooks/useAuth";
 
 import FormLayout from "../components/common/FormLayout";
-import useRegister from "../hooks/useRegister";
-import { useEffect } from "react";
+import CustomFormControl from "../components/form/CustomFormControl";
+import constants from "../constants";
+
+import { AuthType } from "../providers/AuthProvider";
 
 const schema = z.object({
     email: z
         .string()
         .nonempty("Email required.")
         .email({ message: "Must be a valid email" }),
-    password: z
-        .string()
-        .nonempty("Password is required.")
-        .min(8, "Too short password."),
+    password: z.string().nonempty("Password is required."),
 });
 
 export type LoginFieldData = z.infer<typeof schema>;
@@ -35,19 +39,23 @@ const Login = () => {
         onSubmitForm,
         errors: resErrors,
         status,
-    } = useRegister("/v1/login");
+    } = useRegister("/v1/login", { withCredentials: true });
+
+    const toast = useToast();
+    const { auth, setAuth } = useAuth();
 
     useEffect(() => {
-        if (status === 409) {
-            const key = Object.keys(resErrors?.fields)[0];
-            setError(key, {
-                type: "server",
-                message: resErrors.message,
-            });
-        }
         if (status === 422) {
             resErrors.errors.forEach((obj: { [key: string]: string[] }) => {
                 const key = Object.keys(obj)[0];
+                toast({
+                    title: `Invalid ${constants[key]} input.`,
+                    description: obj[key],
+                    status: "error",
+                    duration: 3000,
+                    isClosable: true,
+                    position: "top-right",
+                });
                 setError(key, {
                     type: "server",
                     message: obj[key],
@@ -58,8 +66,31 @@ const Login = () => {
 
     const onSubmit = async (data: LoginFieldData) => {
         const res = await onSubmitForm(data);
-        if(res?.status === 200){
-            console.log(res)
+        if (res?.status === 200) {
+
+            setAuth((prev: AuthType) => ({
+                ...prev,
+                accessToken:res?.data?.accessToken,
+                user: res?.data?.user,
+            }));
+            toast({
+                title: "Successful.",
+                description: res.data.message,
+                status: "success",
+                duration: 9000,
+                isClosable: true,
+                position: "top-right",
+            });
+        }
+        if (res?.status === 401) {
+            toast({
+                title: "Failed to login.",
+                description: "Incorrect credentials.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top-right",
+            });
         }
     };
 

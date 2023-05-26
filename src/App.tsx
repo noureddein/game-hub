@@ -1,23 +1,23 @@
 // ** React imports
 import { useState } from "react";
 
-// ** Chakra imports
-import { Grid, GridItem } from "@chakra-ui/react";
-
 // ** Third-party packages
 import { Route, Routes } from "react-router-dom";
-
-// ** Components imports
-import Navbar from "./components/Navbar";
 
 // ** Types imports
 import { type Genre } from "./hooks/useGenres";
 import { type Platform } from "./hooks/usePlatforms";
 
-// ** Pages imports 
+// ** Components imports
+import RequireAuth from "./components/RequireAuth";
+
+// ** Routes imports
 import Login from "./routes/Login";
 import Register from "./routes/Register";
 import Home from "./routes/Home";
+import Layout from "./components/Layout";
+import UserProfile from "./routes/UserProfile";
+import NotFound from "./routes/NotFound";
 
 export interface GameQuery {
     genre: Genre | null;
@@ -42,22 +42,14 @@ function App() {
         setGameQuery({ ...gameQuery, searchText });
 
     return (
-        <>
-            <Grid
-                templateAreas={{
-                    base: `"nav" "main"`,
-                    lg: `"nav nav" "aside main"`, // Wider than 992px
-                }}
-                templateColumns={{
-                    base: "1fr",
-                    lg: "200px 1fr",
-                }}
-            >
-                <GridItem area="nav">
-                    <Navbar onSearch={onSearch} />
-                </GridItem>
-            </Grid>
-            <Routes>
+        <Routes>
+            <Route path="/" element={<Layout onSearch={onSearch} />}>
+                {/* Public Routes */}
+                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<Login />} />
+
+                {/* Protected Routes */}
+                <Route element={<RequireAuth />}>
                 <Route
                     path="/"
                     element={
@@ -69,10 +61,13 @@ function App() {
                         />
                     }
                 />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-            </Routes>
-        </>
+                    <Route path="/profile" element={<UserProfile />} />
+                </Route>
+
+                {/* Catch all unregistered routes */}
+                <Route path="*" element={<NotFound />} />
+            </Route>
+        </Routes>
     );
 }
 

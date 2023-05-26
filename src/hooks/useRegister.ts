@@ -1,37 +1,39 @@
-﻿import { useState, useEffect } from "react";
+﻿import { useState } from "react";
 import backendClient from "../services/backend-client";
-import { type FieldData } from "../routes/Register";
 
 interface SubmitResults {
     errors: any;
-    success: null;
     status: number;
 }
 
-const useRegister = (endpoint: string) => {
+const useRegister = (endpoint: string, config = {}) => {
     const [submitResults, setSubmitResults] = useState<SubmitResults>({
         errors: {},
-        success: null,
         status: 0,
     });
+
+    const resetErrors = () =>
+        setSubmitResults({ ...submitResults, errors: {} });
 
     const onSubmitForm = async <T>(formData: T) => {
         try {
             const res = await backendClient.post(endpoint, {
                 ...formData,
-            });
-            return res
+            }, config);
+            return res;
         } catch (err: any) {
             setSubmitResults({
                 ...submitResults,
                 errors: err.response.data,
                 status: err.response.status,
             });
+            return err.response;
         }
     };
 
     return {
         onSubmitForm,
+        resetErrors,
         errors: submitResults.errors,
         status: submitResults.status,
     };

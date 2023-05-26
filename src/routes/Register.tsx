@@ -1,11 +1,17 @@
 ﻿import { useEffect } from "react";
+
 import { Box, Flex } from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/react";
+
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import CustomFormControl from "../components/form/CustomFormControl";
 import useRegister from "../hooks/useRegister";
 import FormLayout from "../components/common/FormLayout";
+
+import constants from "../constants";
 
 const schema = z
     .object({
@@ -43,18 +49,30 @@ const Register = () => {
         errors: resErrors,
         status,
     } = useRegister("/v1/user/create");
+    const toast = useToast();
 
     useEffect(() => {
         if (status === 409) {
-            const key = Object.keys(resErrors?.fields)[0];
-            setError(key, {
-                type: "server",
-                message: resErrors.message,
+            toast({
+                title: "Failed creating new account.",
+                description: resErrors.message,
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top-right",
             });
         }
         if (status === 422) {
             resErrors.errors.forEach((obj: { [key: string]: string[] }) => {
                 const key = Object.keys(obj)[0];
+                toast({
+                    title: `Invalid ${constants[key]} input.`,
+                    description: obj[key],
+                    status: "error",
+                    duration: 3000,
+                    isClosable: true,
+                    position: "top-right",
+                });
                 setError(key, {
                     type: "server",
                     message: obj[key],
@@ -64,9 +82,16 @@ const Register = () => {
     }, [resErrors]);
 
     const onSubmit = async (data: FieldData) => {
-        const res= await onSubmitForm(data);
+        const res = await onSubmitForm(data);
         if (res?.status === 201) {
-            console.log("User Created from front-end", res);
+            toast({
+                title: "Successful.",
+                description: res.data.message,
+                status: "success",
+                duration: 9000,
+                isClosable: true,
+                position: "top-right",
+            });
         }
     };
     return (

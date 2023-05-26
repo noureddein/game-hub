@@ -16,3 +16,11 @@ const breakpoints = {
   '2xl': '96em', // 1536px
 }
 ```
+
+
+## Cookies 
+
+- req.cookies has options:
+  - httpOnly: make the cookies not accessible from client browser
+  - secure: make cookies accessible only on https
+  - maxAge: make cookies valid for certain amount of time (measured in ms)
